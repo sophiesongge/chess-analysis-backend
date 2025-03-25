@@ -38,3 +38,11 @@ def analyze_position(request: AnalysisRequest, db: Session = Depends(get_db)):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/best-move")
+def get_best_move(request: AnalysisRequest):
+    try:
+        result = stockfish_service.get_best_move(request.fen)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
