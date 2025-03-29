@@ -10,6 +10,7 @@ class AnalysisRequest(BaseModel):
     fen: str
     depth: int = 20
 
+# 创建一个带有/api前缀的路由器
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
@@ -17,6 +18,7 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
+# 创建服务实例
 stockfish_service = StockfishService()
 opening_service = OpeningService()
 
@@ -49,8 +51,18 @@ def get_best_move(request: AnalysisRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/identify-opening")
+# 修改开局识别路由，添加/api前缀
+@app.post("/api/identify-opening")
 def identify_opening(request: AnalysisRequest):
+    try:
+        result = opening_service.identify_opening(request.fen)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# 保留原来的路由以保持兼容性
+@app.post("/identify-opening")
+def identify_opening_legacy(request: AnalysisRequest):
     try:
         result = opening_service.identify_opening(request.fen)
         return result
