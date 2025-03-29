@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.db.session import get_db
 from app.services.stockfish_service import StockfishService
+from app.services.opening_service import OpeningService
 
 class AnalysisRequest(BaseModel):
     fen: str
@@ -17,6 +18,7 @@ app = FastAPI(
 )
 
 stockfish_service = StockfishService()
+opening_service = OpeningService()
 
 @app.get("/")
 def read_root():
@@ -43,6 +45,14 @@ def analyze_position(request: AnalysisRequest, db: Session = Depends(get_db)):
 def get_best_move(request: AnalysisRequest):
     try:
         result = stockfish_service.get_best_move(request.fen)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/identify-opening")
+def identify_opening(request: AnalysisRequest):
+    try:
+        result = opening_service.identify_opening(request.fen)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
