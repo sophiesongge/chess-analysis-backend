@@ -68,3 +68,20 @@ def identify_opening_legacy(request: AnalysisRequest):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+class MoveEvaluationRequest(BaseModel):
+    fen: str
+    move: str
+    depth: int = 20
+
+@app.post("/api/evaluate-move")
+def evaluate_move(request: MoveEvaluationRequest):
+    try:
+        result = stockfish_service.evaluate_move(
+            request.fen,
+            request.move,
+            request.depth
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
